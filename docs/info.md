@@ -9,12 +9,18 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-It performs the operation of the SPI communication protocol, where a master device controls the clock and sends data to a slave device through dedicated lines. Data is shifted bit by bit on each clock pulse, ensuring fast and synchronized transfer between devices.
+SPI Mode 0 master. Transmits 8 bits MSB-first on MOSI, toggling SCLK
+(idle low, sample on rising edge). SS_n is asserted low for the duration
+of the transfer. SCLK runs at clk/4 (2.5 MHz at 10 MHz system clock).
 
 ## How to test
 
-Different input combinations can be applied to the master and slave, and the outputs observed. These results are then compared with the expected truth table to confirm correct communication and synchronization.
+Set `ui_in[7:0]` to the byte you want to transmit.
+Pulse `uio_in[0]` (start) high for one clock cycle.
+Monitor `uo_out[1]` (SCLK) and `uo_out[0]` (MOSI) on a logic analyser.
+`uo_out[3]` (busy) goes high for the duration of the transfer.
+`uo_out[2]` (ss_n) goes low during the transfer.
 
 ## External hardware
 
-No external hardware required
+SPI slave device: connect MOSI, SCLK, SS_n to the slave.
