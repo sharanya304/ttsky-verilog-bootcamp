@@ -9,11 +9,11 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-It performs half adder operation
+It performs the operation of the SPI communication protocol, where a master device controls the clock and sends data to a slave device through dedicated lines. Data is shifted bit by bit on each clock pulse, ensuring fast and synchronized transfer between devices.
 
 ## How to test
 
-Give different input combinations and verify it with truth table
+Different input combinations can be applied to the master and slave, and the outputs observed. These results are then compared with the expected truth table to confirm correct communication and synchronization.
 
 ## External hardware
 
