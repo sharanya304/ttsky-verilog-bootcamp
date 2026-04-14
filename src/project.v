@@ -228,3 +228,22 @@ module dma_channel (
     end
 
 endmodule
+
+// DMA Channel Module - Core implementation
+module dma_channel (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] cfg_in,
+    input wire [1:0] word_width_sel,
+    input wire channel_active,
+    output wire [6:0] data_out,
+    output wire [2:0] error_flags,
+    output wire dma_done
+);
+    
+    // Placeholder implementation - replace with your actual logic
+    assign data_out = 7'b0;
+    assign error_flags = 3'b0;
+    assign dma_done = 1'b0;
+    
+endmodule
