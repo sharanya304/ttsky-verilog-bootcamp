@@ -3,7 +3,7 @@ project:
   title:        "dma_multi_channel"      # Project title
   author:       "Sharanya"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Test Pattern Generator that outputs predefined digital sequences for verification and debugging."      # One line description of what your project does
+  description:  "Design of a Tiny DMA controller for memory to memory copy"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
