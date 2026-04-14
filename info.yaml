@@ -1,9 +1,9 @@
 # Tiny Tapeout project information
 project:
-  title:        "spi_master"      # Project title
+  title:        "uart_i2c_bridge"      # Project title
   author:       "sharanya"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "8-bit SPI master, Mode 0, MSB-first. SCLK=clk/4. Configurable TX via ui_in"      # One line description of what your project does
+  description:  "UART to I2C bridge that converts serial UART input into I2C transactions for communication with external devices."      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -11,7 +11,7 @@ project:
   tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_spi_master"
+  top_module:  "tt_um_uart_i2c_bridge"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
@@ -21,27 +21,28 @@ project:
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
-pinout:
-  ui[0]: "tx_data[0]"
-  ui[1]: "tx_data[1]"
-  ui[2]: "tx_data[2]"
-  ui[3]: "tx_data[3]"
-  ui[4]: "tx_data[4]"
-  ui[5]: "tx_data[5]"
-  ui[6]: "tx_data[6]"
-  ui[7]: "tx_data[7] (MSB)"
 
-  uo[0]: "MOSI"
-  uo[1]: "SCLK"
-  uo[2]: "SS_N (active-low)"
-  uo[3]: "BUSY"
+pinout:
+  ui[0]: "UART_RX (tx_data[0])"
+  ui[1]: "UART_RX (tx_data[1])"
+  ui[2]: "UART_RX (tx_data[2])"
+  ui[3]: "UART_RX (tx_data[3])"
+  ui[4]: "UART_RX (tx_data[4])"
+  ui[5]: "UART_RX (tx_data[5])"
+  ui[6]: "UART_RX (tx_data[6])"
+  ui[7]: "UART_RX (tx_data[7] - MSB)"
+
+  uo[0]: "UART_TX (MOSI)"
+  uo[1]: "I2C_SCL (Serial Clock)"
+  uo[2]: "I2C_SS_N (Start/Enable, Active Low)"
+  uo[3]: "BUSY (Transaction in Progress)"
   uo[4]: ""
   uo[5]: ""
   uo[6]: ""
   uo[7]: ""
 
-  uio[0]: "START (input, 1-cycle pulse)"
-  uio[1]: "MISO (reserved, input)"
+  uio[0]: "START (Trigger input, 1-cycle pulse)"
+  uio[1]: "I2C_SDA (MISO / Data Line)"
   uio[2]: ""
   uio[3]: ""
   uio[4]: ""
