@@ -15,43 +15,7 @@ module tt_um_test_pattern_gen (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-/*
- * tt_um_test_pattern_gen - Test Pattern Generator for Tiny Tapeout (SKY130)
- *
- * Generates selectable test patterns on 8-bit output:
- *   mode[1:0] via ui_in[1:0]:
- *     00 - Walking ones  (one hot shifting left)
- *     01 - PRBS-8 (maximal-length LFSR)
- *     10 - Counting ramp (0x00 -> 0xFF repeating)
- *     11 - Checkerboard (0xAA / 0x55 alternating)
- *
- * ui_in[2]  - hold  : freeze output
- * ui_in[3]  - reset : synchronous active-high reset (also via rst_n active-low)
- * uo_out    - 8-bit pattern output
- * uio_out   - upper nibble mirrors uo_out[7:4], lower = pattern_done flag
- * uio_oe    - all driven (0xFF)
- *
- * Author  : sharanya304
- * License : Apache-2.0
- */
-
-`default_nettype none
-
-module tt_um_test_pattern_gen (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // IOs: Input path
-    output wire [7:0] uio_out,  // IOs: Output path
-    output wire [7:0] uio_oe,   // IOs: Enable path (1=output, 0=input)
-    input  wire       ena,      // Always 1 when the design is powered on
-    input  wire       clk,      // Clock
-    input  wire       rst_n     // Active-low reset from TT infrastructure
-);
-
-    // ----------------------------------------------------------------
-    // Internal signals
-    // ----------------------------------------------------------------
-    wire [1:0] mode  = ui_in[1:0];
+     wire [1:0] mode  = ui_in[1:0];
     wire       hold  = ui_in[2];
     wire       srst  = ui_in[3];           // synchronous active-high reset
 
@@ -132,7 +96,7 @@ module tt_um_test_pattern_gen (
             case (mode)
                 2'b00: begin
                     pattern <= walk_reg;
-                    done    <= (walk_reg == 8'h80);    // wrapped when MSB set and about to roll
+                    done    <= (walk_reg == 8'h80);    // wrapped when MSB set
                 end
                 2'b01: begin
                     pattern <= lfsr;
@@ -158,8 +122,8 @@ module tt_um_test_pattern_gen (
     // Output assignments
     // ----------------------------------------------------------------
     assign uo_out  = pattern;
-    assign uio_oe  = 8'hFF;              // all IOs are outputs
-    assign uio_out = {pattern[7:4], 3'b000, done};   // upper nibble + done flag
+    assign uio_oe  = 8'hFF;                            // all IOs are outputs
+    assign uio_out = {pattern[7:4], 3'b000, done};     // upper nibble + done flag
 
     // Silence unused inputs (required by TT lint)
     wire _unused = &{ena, uio_in, 1'b0};
