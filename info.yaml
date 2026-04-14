@@ -23,32 +23,35 @@ project:
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 
 pinout:
-  ui[0]: "UART_RX (tx_data[0])"
-  ui[1]: "UART_RX (tx_data[1])"
-  ui[2]: "UART_RX (tx_data[2])"
-  ui[3]: "UART_RX (tx_data[3])"
-  ui[4]: "UART_RX (tx_data[4])"
-  ui[5]: "UART_RX (tx_data[5])"
-  ui[6]: "UART_RX (tx_data[6])"
-  ui[7]: "UART_RX (tx_data[7] - MSB)"
+ 
+  ui[0]: "mode[0] - Pattern select bit 0"
+  ui[1]: "mode[1] - Pattern select bit 1"
+  ui[2]: "hold    - Freeze output when high"
+  ui[3]: "srst    - Synchronous reset (active high)"
+  ui[4]: ""
+  ui[5]: ""
+  ui[6]: ""
+  ui[7]: ""
 
-  uo[0]: "UART_TX (MOSI)"
-  uo[1]: "I2C_SCL (Serial Clock)"
-  uo[2]: "I2C_SS_N (Start/Enable, Active Low)"
-  uo[3]: "BUSY (Transaction in Progress)"
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "pattern[0] - Output bit 0 (LSB)"
+  uo[1]: "pattern[1] - Output bit 1"
+  uo[2]: "pattern[2] - Output bit 2"
+  uo[3]: "pattern[3] - Output bit 3"
+  uo[4]: "pattern[4] - Output bit 4"
+  uo[5]: "pattern[5] - Output bit 5"
+  uo[6]: "pattern[6] - Output bit 6"
+  uo[7]: "pattern[7] - Output bit 7 (MSB)"
 
-  uio[0]: "START (Trigger input, 1-cycle pulse)"
-  uio[1]: "I2C_SDA (MISO / Data Line)"
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
+  uio[0]: "done       - Pattern cycle complete pulse"
+  uio[1]: "pattern[4] - Mirror of output bit 4"
+  uio[2]: "pattern[5] - Mirror of output bit 5"
+  uio[3]: "pattern[6] - Mirror of output bit 6"
+  uio[4]: "pattern[7] - Mirror of output bit 7"
   uio[5]: ""
   uio[6]: ""
   uio[7]: ""
+
+
 
 # Do not change!
 yaml_version: 6
