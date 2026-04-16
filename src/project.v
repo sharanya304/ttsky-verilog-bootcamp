@@ -117,19 +117,17 @@ module dma_channel (
     localparam DONE     = 2'b10;
     
     // =====================================================================
-    // Memory Initialization (ASCII test data: a, b, c, d)
+    // Memory Initialization (FIXED: use initial block, not always block)
     // =====================================================================
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            mem[0] <= 7'h61;  // 'a'
-            mem[1] <= 7'h62;  // 'b'
-            mem[2] <= 7'h63;  // 'c'
-            mem[3] <= 7'h64;  // 'd'
-            mem[4] <= 7'h00;
-            mem[5] <= 7'h00;
-            mem[6] <= 7'h00;
-            mem[7] <= 7'h00;
-        end
+    initial begin
+        mem[0] = 7'h61;  // 'a'
+        mem[1] = 7'h62;  // 'b'
+        mem[2] = 7'h63;  // 'c'
+        mem[3] = 7'h64;  // 'd'
+        mem[4] = 7'h00;
+        mem[5] = 7'h00;
+        mem[6] = 7'h00;
+        mem[7] = 7'h00;
     end
     
     // =====================================================================
@@ -148,85 +146,85 @@ module dma_channel (
             src_boundary_err <= 1'b0;
             dst_boundary_err <= 1'b0;
             addr_mismatch_err <= 1'b0;
-        end else if (channel_active) begin
-            // Default: hold outputs
+        end else begin
+            // Default: clear done pulse (happens every cycle unless explicitly set)
             dma_done <= 1'b0;
-            data_out <= data_out;
             
-            case (state)
-                // =========================================================
-                // IDLE State: Wait for start signal
-                // =========================================================
-                IDLE: begin
-                    error_flags      <= 3'b0;
-                    src_boundary_err <= 1'b0;
-                    dst_boundary_err <= 1'b0;
-                    addr_mismatch_err <= 1'b0;
-                    
-                    if (cfg_in[7]) begin  // Start signal
-                        src_ptr <= cfg_in[6:4];
-                        dst_ptr <= cfg_in[3:1];
+            if (channel_active) begin
+                case (state)
+                    // =========================================================
+                    // IDLE State: Wait for start signal
+                    // =========================================================
+                    IDLE: begin
+                        error_flags      <= 3'b0;
+                        src_boundary_err <= 1'b0;
+                        dst_boundary_err <= 1'b0;
+                        addr_mismatch_err <= 1'b0;
                         
-                        // Determine transfer mode
-                        case (word_width_sel)
-                            2'b00: effective_mode <= cfg_in[0];  // Use original mode bit
-                            2'b01: effective_mode <= 1'b1;       // Force 8-bit (3 words)
-                            2'b10: effective_mode <= 1'b1;       // Force 16-bit (3 words)
-                            default: effective_mode <= cfg_in[0];
-                        endcase
-                        
-                        // Set word count: single=1, burst=3
-                        words_left <= (cfg_in[0] | (word_width_sel != 2'b00)) ? 3'd3 : 3'd1;
-                        state <= TRANSFER;
-                    end
-                end
-                
-                // =========================================================
-                // TRANSFER State: Perform data transfer
-                // =========================================================
-                TRANSFER: begin
-                    // Boundary checking
-                    src_boundary_err <= (src_ptr > 3'd7);
-                    dst_boundary_err <= (dst_ptr > 3'd7);
-                    addr_mismatch_err <= (src_ptr == dst_ptr);
-                    
-                    if (src_boundary_err || dst_boundary_err || addr_mismatch_err) begin
-                        // Error detected: set flags and move to done
-                        error_flags <= {addr_mismatch_err, dst_boundary_err, src_boundary_err};
-                        state <= DONE;
-                    end else begin
-                        // Perform transfer
-                        mem[dst_ptr] <= mem[src_ptr];
-                        data_out <= mem[src_ptr];
-                        
-                        src_ptr <= src_ptr + 1'b1;
-                        dst_ptr <= dst_ptr + 1'b1;
-                        
-                        if (words_left == 3'd1) begin
-                            // Last word transferred
-                            error_flags <= 3'b0;  // No errors
-                            state <= DONE;
-                        end else begin
-                            words_left <= words_left - 1'b1;
+                        if (cfg_in[7]) begin  // Start signal
+                            src_ptr <= cfg_in[6:4];
+                            dst_ptr <= cfg_in[3:1];
+                            
+                            // Determine transfer mode
+                            case (word_width_sel)
+                                2'b00: effective_mode <= cfg_in[0];  // Use original mode bit
+                                2'b01: effective_mode <= 1'b1;       // Force 8-bit (3 words)
+                                2'b10: effective_mode <= 1'b1;       // Force 16-bit (3 words)
+                                default: effective_mode <= cfg_in[0];
+                            endcase
+                            
+                            // Set word count: single=1, burst=3
+                            words_left <= (cfg_in[0] | (word_width_sel != 2'b00)) ? 3'd3 : 3'd1;
+                            state <= TRANSFER;
                         end
                     end
-                end
-                
-                // =========================================================
-                // DONE State: Signal completion
-                // =========================================================
-                DONE: begin
-                    dma_done <= 1'b1;
-                    state <= IDLE;
-                end
-                
-                default: begin
-                    state <= IDLE;
-                end
-            endcase
+                    
+                    // =========================================================
+                    // TRANSFER State: Perform data transfer
+                    // =========================================================
+                    TRANSFER: begin
+                        // Boundary checking
+                        src_boundary_err <= (src_ptr > 3'd7);
+                        dst_boundary_err <= (dst_ptr > 3'd7);
+                        addr_mismatch_err <= (src_ptr == dst_ptr);
+                        
+                        if ((src_ptr > 3'd7) || (dst_ptr > 3'd7) || (src_ptr == dst_ptr)) begin
+                            // Error detected: set flags and move to done
+                            error_flags <= {addr_mismatch_err, dst_boundary_err, src_boundary_err};
+                            state <= DONE;
+                        end else begin
+                            // Perform transfer
+                            mem[dst_ptr] <= mem[src_ptr];
+                            data_out <= mem[src_ptr];
+                            
+                            src_ptr <= src_ptr + 3'd1;
+                            dst_ptr <= dst_ptr + 3'd1;
+                            
+                            if (words_left == 3'd1) begin
+                                // Last word transferred
+                                error_flags <= 3'b0;  // No errors
+                                state <= DONE;
+                            end else begin
+                                words_left <= words_left - 3'd1;
+                            end
+                        end
+                    end
+                    
+                    // =========================================================
+                    // DONE State: Signal completion
+                    // =========================================================
+                    DONE: begin
+                        dma_done <= 1'b1;
+                        state <= IDLE;
+                    end
+                    
+                    default: begin
+                        state <= IDLE;
+                    end
+                endcase
+            end
         end
     end
 
 endmodule
-
 
